@@ -8,34 +8,38 @@ const EditChart = () => {
   const orgchart = useRef();
   const datasource = {
     id: "n1",
-    name: "Lao Lao",
-    title: "general manager",
+    name: "Claim Assistance",
+    title: "Menu Options :",
     children: [
-      { id: "n2", name: "Bo Miao", title: "department manager" },
+      { id: "n2", name: "Claim Status", title: "Claim Status" },
       {
         id: "n3",
-        name: "Su Miao",
-        title: "department manager",
+        name: "File a Claim",
+        title: "File a Claim",
+        intent: "Placeholder",
         children: [
-          { id: "n4", name: "Tie Hua", title: "senior engineer" },
           {
             id: "n5",
-            name: "Hei Hei",
-            title: "senior engineer",
+            name: "Policy Number",
+            title: "Enter Policy Number",
             children: [
-              { id: "n6", name: "Dan Dan", title: "engineer" },
-              { id: "n7", name: "Xiang Xiang", title: "engineer" }
+              { id: "n6", name: "Valiation", title: "Policy Number Validation" }
             ]
-          },
-          { id: "n8", name: "Pang Pang", title: "senior engineer" }
+          }
         ]
       },
-      { id: "n9", name: "Hong Miao", title: "department manager" },
       {
         id: "n10",
-        name: "Chun Miao",
-        title: "department manager",
-        children: [{ id: "n11", name: "Yue Yue", title: "senior engineer" }]
+        name: "Change Topic",
+        title: "Change Topic",
+        children: [
+          { id: "n11", name: "Main Menu Choice", title: "Redirect to Main Menu?",
+          children: [
+            { id: "n12", name: "Yes", title: "Yes" },
+            { id: "n13", name: "No", title: "No"}
+          ] 
+        }
+        ]
       }
     ]
   };
@@ -46,6 +50,8 @@ const EditChart = () => {
   const [newNodes, setNewNodes] = useState([{ name: "", title: "" }]);
   const [isEditMode, setIsEditMode] = useState(true);
   const [isMultipleSelect, setIsMultipleSelect] = useState(false);
+  const [newNodeName, setNewNodeName] = useState("");
+  const [newNodeTitle, setNewNodeTitle] = useState("");
 
   const readSelectedNode = nodeData => {
     if (isMultipleSelect) {
@@ -62,11 +68,13 @@ const EditChart = () => {
   const onNameChange = (e, index) => {
     newNodes[index].name = e.target.value;
     setNewNodes([...newNodes]);
+    setNewNodeName(e.target.value);
   };
 
   const onTitleChange = (e, index) => {
     newNodes[index].title = e.target.value;
     setNewNodes([...newNodes]);
+    setNewNodeTitle(e.target.value);
   };
 
   const addNewNode = () => {
@@ -107,6 +115,11 @@ const EditChart = () => {
     await dsDigger.removeNodes([...selectedNodes].map(node => node.id));
     setDS({ ...dsDigger.ds });
     setSelectedNodes(new Set());
+  };
+
+  const updateNodes = async () => {
+    await dsDigger.updateNodes([...selectedNodes].map(node => node.id), { id: uuidv4(), name: newNodeName, title: newNodeTitle });
+    setDS({ ...dsDigger.ds });
   };
 
   const onMultipleSelectChange = e => {
@@ -189,6 +202,9 @@ const EditChart = () => {
           </button>
           <button disabled={!isEditMode} onClick={remove}>
             Remove Nodes
+          </button>
+          <button disabled={!isEditMode} onClick={updateNodes}>
+            Update Nodes
           </button>
           <input
             style={{ marginLeft: "1rem" }}
