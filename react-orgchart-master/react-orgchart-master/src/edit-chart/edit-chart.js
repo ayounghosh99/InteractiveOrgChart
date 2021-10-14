@@ -1,10 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import JSONDigger from "json-digger";
 import { v4 as uuidv4 } from "uuid";
 import OrganizationChart from "../components/ChartContainer";
 import "./edit-chart.css";
 import ReactJson from 'react-json-view';
 import MyNode from "../custom-node-chart/my-node";
+
+
 
 const EditChart = () => {
   const orgchart = useRef();
@@ -47,7 +49,20 @@ const EditChart = () => {
     ]
   };
 
-  const [ds, setDS] = useState(datasource);
+
+  const getJsonData = () => {
+    let jsonData = localStorage.getItem('JsonData'); // TODO : Replacing it with the logic for retreiving data from a database
+  
+    if(jsonData) {
+      return JSON.parse(localStorage.getItem('JsonData'));
+    } else {
+      return datasource;
+    }
+  };
+
+  // const [ds, setDS] = useState(datasource);
+  const [ds, setDS] = useState(getJsonData()); 
+
   const dsDigger = new JSONDigger(ds, "id", "children");
 
   const [selectedNodes, setSelectedNodes] = useState(new Set());
@@ -58,6 +73,7 @@ const EditChart = () => {
   const [newNodeTitle, setNewNodeTitle] = useState("");
   const [showDetails, setShowDetails] = useState(false);
   const [detailsNode, setDetailsNode] = useState({})
+
 
   const readSelectedNode = nodeData => {
     if (isMultipleSelect) {
@@ -164,6 +180,10 @@ const EditChart = () => {
       orgchart.current.expandAllNodes();
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem('JsonData', JSON.stringify(ds)); // TODO : Replacing it with the logic for storing data(ds) in a database
+  }, [ds]);
 
   return (
     <div className="edit-chart-wrapper">
