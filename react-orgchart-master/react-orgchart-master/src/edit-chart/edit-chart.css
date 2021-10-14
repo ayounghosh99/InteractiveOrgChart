@@ -26,8 +26,12 @@
   list-style: none;
 }
 
+.edit-chart-wrapper .toolbar .new-nodes{
+  padding-left: 50px;
+}
+
 .edit-chart-wrapper .toolbar .new-nodes li {
-  padding: 0.25rem 0;
+  padding: 0.75rem 0;
 }
 
 .edit-chart-wrapper button {
@@ -40,8 +44,8 @@
   cursor: pointer;
   user-select: none;
   color: #fff;
-  background-color: #5cb85c;
-  border: 2px solid #5cb85c;
+  background-color:#9C0059;
+  border: 2px solid#9C0059;
 }
 
 .edit-chart-wrapper .toolbar .action-buttons button {
@@ -65,6 +69,11 @@
 .edit-chart-wrapper button:hover,
 .edit-chart-wrapper button:focus,
 .edit-chart-wrapper button:active {
-  color: #5cb85c;
+  color:#9C0059;
   background-color: #fff;
+}
+
+.treeView{
+  display: flex;
+  justify-content: space-evenly;
 }

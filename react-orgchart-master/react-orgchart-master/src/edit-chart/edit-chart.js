@@ -3,13 +3,15 @@ import JSONDigger from "json-digger";
 import { v4 as uuidv4 } from "uuid";
 import OrganizationChart from "../components/ChartContainer";
 import "./edit-chart.css";
+import ReactJson from 'react-json-view';
+import MyNode from "../custom-node-chart/my-node";
 
 const EditChart = () => {
   const orgchart = useRef();
   const datasource = {
     id: "n1",
     name: "Claim Assistance",
-    title: "Menu Options :",
+    title: "Menu Options",
     children: [
       { id: "n2", name: "Claim Status", title: "Claim Status" },
       {
@@ -23,7 +25,7 @@ const EditChart = () => {
             name: "Policy Number",
             title: "Enter Policy Number",
             children: [
-              { id: "n6", name: "Valiation", title: "Policy Number Validation" }
+              { id: "n6", name: "Validation", title: "Policy Number Validation" }
             ]
           }
         ]
@@ -33,16 +35,18 @@ const EditChart = () => {
         name: "Change Topic",
         title: "Change Topic",
         children: [
-          { id: "n11", name: "Main Menu Choice", title: "Redirect to Main Menu?",
-          children: [
-            { id: "n12", name: "Yes", title: "Yes" },
-            { id: "n13", name: "No", title: "No"}
-          ] 
-        }
+          {
+            id: "n11", name: "Main Menu Choice", title: "Redirect to Main Menu?",
+            children: [
+              { id: "n12", name: "Yes", title: "Yes" },
+              { id: "n13", name: "No", title: "No" }
+            ]
+          }
         ]
       }
     ]
   };
+
   const [ds, setDS] = useState(datasource);
   const dsDigger = new JSONDigger(ds, "id", "children");
 
@@ -52,6 +56,8 @@ const EditChart = () => {
   const [isMultipleSelect, setIsMultipleSelect] = useState(false);
   const [newNodeName, setNewNodeName] = useState("");
   const [newNodeTitle, setNewNodeTitle] = useState("");
+  const [showDetails, setShowDetails] = useState(false);
+  const [detailsNode, setDetailsNode] = useState({})
 
   const readSelectedNode = nodeData => {
     if (isMultipleSelect) {
@@ -120,7 +126,33 @@ const EditChart = () => {
   const updateNodes = async () => {
     await dsDigger.updateNodes([...selectedNodes].map(node => node.id), { id: uuidv4(), name: newNodeName, title: newNodeTitle });
     setDS({ ...dsDigger.ds });
+
   };
+
+  const updateProperties = async () => {
+    let node = await dsDigger.findNodeById([...selectedNodes].map(node => node.id)[0])
+    node[newNodeName] = newNodeTitle;
+    let nodes = [node];
+    await dsDigger.addSiblings([...selectedNodes].map(node => node.id)[0], nodes);
+    await dsDigger.removeNodes([...selectedNodes].map(node => node.id));
+    setDS({ ...dsDigger.ds });
+    setShowDetails(true)
+    setDetailsNode(node);
+    console.log(ds)
+  }
+
+  const showNodeDetails = async () => {
+    let node = null;
+    if ([...selectedNodes].map(node => node.id)[0]) {
+      node = await dsDigger.findNodeById([...selectedNodes].map(node => node.id)[0])
+    }
+    else {
+      node = ds
+    }
+
+    setDetailsNode(node);
+    setShowDetails(!showDetails)
+  }
 
   const onMultipleSelectChange = e => {
     setIsMultipleSelect(e.target.checked);
@@ -136,7 +168,7 @@ const EditChart = () => {
   return (
     <div className="edit-chart-wrapper">
       <section className="toolbar">
-        <div className="selected-nodes">
+        {/* <div className="selected-nodes">
           <div>
             <h4 style={{ display: "inline-block" }}>Selected Node</h4>
             <input
@@ -155,7 +187,7 @@ const EditChart = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
         <div className="new-nodes">
           <h4>New Nodes</h4>
           <ul>
@@ -179,13 +211,13 @@ const EditChart = () => {
                       +
                     </button>
                   ) : (
-                    <button
-                      disabled={!isEditMode}
-                      onClick={() => removeNewNode(index)}
-                    >
-                      -
-                    </button>
-                  )}
+                      <button
+                        disabled={!isEditMode}
+                        onClick={() => removeNewNode(index)}
+                      >
+                        -
+                      </button>
+                    )}
                 </li>
               ))}
           </ul>
@@ -206,6 +238,12 @@ const EditChart = () => {
           <button disabled={!isEditMode} onClick={updateNodes}>
             Update Nodes
           </button>
+          <button disabled={!isEditMode} onClick={updateProperties}>
+            Update Properties
+          </button>
+          <button disabled={!isEditMode} onClick={showNodeDetails}>
+            {!showDetails ? "Show Details" : "Hide Details"}
+          </button>
           <input
             style={{ marginLeft: "1rem" }}
             id="cb-mode"
@@ -216,14 +254,21 @@ const EditChart = () => {
           <label htmlFor="cb-mode">Edit Mode</label>
         </div>
       </section>
-      <OrganizationChart
-        ref={orgchart}
-        datasource={ds}
-        collapsible={!isEditMode}
-        multipleSelect={isMultipleSelect}
-        onClickNode={readSelectedNode}
-        onClickChart={clearSelectedNode}
-      />
+      {/* <div className="treeView"> */}
+      {/* {showDetails ?
+          <ReactJson src={detailsNode} /> : ""} */}
+      <div>
+        <OrganizationChart
+          ref={orgchart}
+          datasource={ds}
+          collapsible={!isEditMode}
+          multipleSelect={isMultipleSelect}
+          onClickNode={readSelectedNode}
+          onClickChart={clearSelectedNode}
+          draggable={true}
+          chartClass="myChart"
+          NodeTemplate={MyNode}
+        /></div>
     </div>
   );
 };

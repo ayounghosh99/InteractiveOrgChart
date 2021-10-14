@@ -39,6 +39,7 @@
     "html2canvas": "^1.0.0-rc.5",
     "json-digger": "^1.1.5",
     "jspdf": "^2.3.1",
+    "react-json-view": "^1.21.3",
     "rxjs": "^6.5.4"
   },
   "devDependencies": {

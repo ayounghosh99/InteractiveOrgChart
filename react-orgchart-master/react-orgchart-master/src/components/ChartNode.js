@@ -255,10 +255,10 @@ const ChartNode = ({
         ) : (
           <>
             <div className="oc-heading">
-              {datasource.relationship &&
+              {/* {datasource.relationship &&
                 datasource.relationship.charAt(2) === "1" && (
-                  <i className="oci oci-leader oc-symbol" />
-                )}
+                  // <i className="oci oci-leader oc-symbol" />
+                )} */}
               {datasource.name}
             </div>
             <div className="oc-content">{datasource.title}</div>
